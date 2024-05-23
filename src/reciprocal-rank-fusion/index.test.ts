@@ -1,4 +1,4 @@
-import { reciprocalRankFusion } from "./reciprocalRankFusion";
+import { reciprocalRankFusion } from ".";
 
 test("test ranks", async () => {
   const rankedList = [

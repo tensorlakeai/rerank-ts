@@ -1,3 +1,3 @@
-export * from "./reciprocalRankFusion";
-export * from "./llmReranker";
+export * from "./reciprocal-rank-fusion";
+export * from "./llm-reranker";
 export { RankedList } from "./types";
