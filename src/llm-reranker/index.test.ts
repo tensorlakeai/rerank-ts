@@ -1,9 +1,11 @@
-import { groqLLMRerank } from ".";
+import { LLMReranker } from ".";
 
 // Substitute with your own API key.
 const API_KEY = "xxx";
 
 test("test ranks", async () => {
+  const reranker = new LLMReranker("groq", "llama3-8b-8192", API_KEY);
+
   const rankedList = [
     { id: "a", value: "I love apple" },
     { id: "b", value: "My name is Edwin" },
@@ -12,6 +14,6 @@ test("test ranks", async () => {
   ];
 
   const query = "I love apples";
-  const result = await groqLLMRerank(rankedList, "id", "value", query, API_KEY);
+  const result = await reranker.rerank(rankedList, "id", "value", query);
   expect(result[0]).toBe("a");
 });
