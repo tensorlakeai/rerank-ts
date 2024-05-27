@@ -1,15 +1,27 @@
-# rerank
+# reranker-ts
 
+<<<<<<< add-llm-ranker
 `rerank` is a lightweight TypeScript library designed for easy re-ranking supporting multiple use cases. `rerank` currently supports single rank list re-ranking and rank list aggregation using Reciprocal Rank Fusion (RRF).
 
 `rerank` allows rank list aggregation by combining multiple ranked lists into a single, improved rank list using various rank aggregation techniques. For this use case, `rerank` supports the Reciprocal Rank Fusion (RRF) method, renowned for its effectiveness in information retrieval and ensemble learning contexts.
 
 `rerank` also supports re-ranking a single rank list by using LLM as a re-ranking agent. This is useful when you have a single rank list and want to improve the ranking semantically based on the content of the list and user query.
+=======
+`reranker-ts` is a lightweight TypeScript library for re-ranking search results from retreival systems. 
+>>>>>>> main
 
-## Features
+## Algorithms 
+#### LLM Re-Rankers
+- [Permutation Generation with sliding windows](https://arxiv.org/pdf/2304.09542)
 
+<<<<<<< add-llm-ranker
 - **Reciprocal Rank Fusion (RRF)**: Combine multiple rank lists by assigning scores based on reciprocal ranks, effectively prioritizing higher-ranked items across all lists.
 - **LLM Reranker**: Re-rank a single rank list using a Language Model (LLM) to improve the ranking for the list semantically.
+=======
+#### Reciprocal RankFusion
+Combine multiple rank lists by assigning scores based on reciprocal ranks, effectively prioritizing higher-ranked items across all lists.
+[Paper](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf)
+>>>>>>> main
 
 ## Installation
 
