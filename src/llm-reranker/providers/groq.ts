@@ -2,7 +2,7 @@ import Groq from "groq-sdk";
 import { ModelProvider } from ".";
 import { IndexedType } from "../../types";
 import { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions";
-import { getPrompt } from "../prompts";
+import { PromptTemplate } from "../prompts";
 
 export class ProviderGroq implements ModelProvider {
   model: string;
@@ -37,8 +37,7 @@ export class ProviderGroq implements ModelProvider {
       passages += `[${index + 1}] ${item[contentKey]}\n`;
     });
 
-    let promptTemplate = `groq-${this.model}`;
-    let prompt = getPrompt(promptTemplate);
+    let prompt = new PromptTemplate(`groq-${this.model}`).prompt;
     let input = eval("`" + prompt + "`");
 
     const completion = await this.infer(input);
