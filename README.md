@@ -4,6 +4,7 @@
 
 ## Algorithms 
 #### LLM Re-Rankers
+- [Permutation Generation with sliding windows](https://arxiv.org/pdf/2304.09542)
 
 #### Reciprocal RankFusion
 Combine multiple rank lists by assigning scores based on reciprocal ranks, effectively prioritizing higher-ranked items across all lists.
