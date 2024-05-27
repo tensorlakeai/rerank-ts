@@ -1,10 +1,11 @@
-import { LLMReranker } from ".";
+import { LLMReranker, ProviderGroq } from ".";
 
 // Substitute with your own API key.
 const API_KEY = "xxx";
 
-test("test ranks", async () => {
-  const reranker = new LLMReranker("groq", "llama3-8b-8192", API_KEY);
+test("test groq ranker", async () => {
+  const provider = new ProviderGroq("llama3-8b-8192", API_KEY);
+  const reranker = new LLMReranker(provider);
 
   const rankedList = [
     { id: "a", value: "I love apple" },
