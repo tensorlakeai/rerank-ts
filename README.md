@@ -8,6 +8,24 @@
 
 - [Permutation Generation with sliding windows](https://arxiv.org/pdf/2304.09542)
 
+Example Usage:
+
+```typescript
+import { LLMReranker, ProviderGroq } from "rerank";
+const provider = new ProviderGroq("llama3-8b-8192", API_KEY);
+const reranker = new LLMReranker(provider);
+
+// Replace with your own list of objects to rerank.
+const list = [
+  { key: "bc8fe338", value: "I hate vegetables" },
+  { key: "236386f2", value: "I love mangoes" },
+];
+
+const query = "I love apples";
+const result = await reranker.rerank(list, "key", "value", query);
+// ["236386f2", "bc8fe338"]
+```
+
 #### Reciprocal RankFusion
 
 Combine multiple rank lists by assigning scores based on reciprocal ranks, effectively prioritizing higher-ranked items across all lists.
