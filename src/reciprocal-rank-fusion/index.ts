@@ -1,6 +1,4 @@
-export type RankedList<T> = T[];
-
-type IndexedType = { [key: string]: any };
+import { IndexedType, RankedList } from "../types";
 
 export function reciprocalRankFusion<T extends IndexedType>(
   rankLists: RankedList<T>[],
