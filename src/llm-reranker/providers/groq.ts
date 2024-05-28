@@ -1,8 +1,6 @@
 import Groq from "groq-sdk";
 import { ModelProvider } from ".";
-import { IndexedType } from "../../types";
 import { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions";
-import { PromptTemplate } from "../prompts";
 
 export class ProviderGroq implements ModelProvider {
   model: string;
@@ -24,39 +22,12 @@ export class ProviderGroq implements ModelProvider {
     this.apiKey = apiKey;
   }
 
-  public async rerank(
-    list: IndexedType[],
-    idKey: keyof IndexedType,
-    contentKey: keyof IndexedType,
-    query: string
-  ): Promise<string[]> {
-    const length = list.length;
-
-    let passages = "";
-    list.forEach((item, index) => {
-      passages += `[${index + 1}] ${item[contentKey]}\n`;
-    });
-
-    let prompt = new PromptTemplate(`groq-${this.model}`).prompt;
-    let input = eval("`" + prompt + "`");
-
-    const completion = await this.infer(input);
-    const ranks = this.parseResult(completion);
-
-    const result: Array<string> = [];
-    ranks.forEach((index) => {
-      result.push(list[index - 1][idKey]);
-    });
-
-    return result;
-  }
-
   /**
    * Creates a completion request using the Groq SDK.
    * @param input Prompt to infer the completion.
    * @returns Text completion from the language model.
    */
-  private async infer(input: string): Promise<string> {
+  public async infer(input: string): Promise<string> {
     const groq = new Groq({
       apiKey: this.apiKey,
     });
@@ -71,25 +42,5 @@ export class ProviderGroq implements ModelProvider {
     });
 
     return completion.choices[0]?.message?.content || "";
-  }
-
-  /**
-   * Parses the completion result to extract the ranking.
-   * @param result Completion result from the language model.
-   * @returns A list of indices in the order of relevance.
-   */
-  private parseResult(result: string): Array<number> {
-    const lines = result.split(">");
-    const ranking: Array<number> = [];
-
-    lines.forEach((line) => {
-      const match = line.match(/\[(\d+)\]/g);
-      if (match) {
-        const index = parseInt(match[0].replace(/\[|\]/g, ""));
-        ranking.push(index);
-      }
-    });
-
-    return ranking;
   }
 }

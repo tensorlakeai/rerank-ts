@@ -1,5 +1,6 @@
 import { IndexedType } from "../types";
 import { ModelProvider } from "./providers";
+import { PromptTemplate } from "./prompts";
 
 export * from "./providers";
 
@@ -38,7 +39,28 @@ export class LLMReranker {
     contentKey: keyof IndexedType,
     query: string
   ): Promise<string[]> {
-    return this.provider.rerank(list, idKey, contentKey, query);
+    const length = list.length;
+
+    let passages = "";
+    list.forEach((item, index) => {
+      passages += `[${index + 1}] ${item[contentKey]}\n`;
+    });
+
+    let provider = this.provider.name;
+    let modelName = this.provider.model;
+
+    let prompt = new PromptTemplate(`${provider}-${modelName}`).prompt;
+    let input = eval("`" + prompt + "`");
+
+    const completion = await this.provider.infer(input);
+    const ranks = this.parseResult(completion);
+
+    const result: Array<string> = [];
+    ranks.forEach((index) => {
+      result.push(list[index - 1][idKey]);
+    });
+
+    return result;
   }
 
   /**
@@ -60,5 +82,32 @@ export class LLMReranker {
       const availableModels = validModels.join("\n");
       throw new Error(`${message}. Valid models:\n${availableModels}`);
     }
+  }
+
+  /**
+   * Parses the completion result to extract the ranking.
+   *
+   * The result should be in the following format:
+   *
+   * ```txt
+   * [1] > [2] > [3] > [4] > [5]
+   * ```
+   *
+   * @param result Completion result from the language model.
+   * @returns A list of indices in the order of relevance.
+   */
+  private parseResult(result: string): Array<number> {
+    const lines = result.split(">");
+    const ranking: Array<number> = [];
+
+    lines.forEach((line) => {
+      const match = line.match(/\[(\d+)\]/g);
+      if (match) {
+        const index = parseInt(match[0].replace(/\[|\]/g, ""));
+        ranking.push(index);
+      }
+    });
+
+    return ranking;
   }
 }

@@ -8,10 +8,5 @@ export interface ModelProvider {
   model: string;
   apiKey: string | undefined;
   validModels: string[];
-  rerank: (
-    list: IndexedType[],
-    idKey: keyof IndexedType,
-    contentKey: keyof IndexedType,
-    query: string
-  ) => Promise<string[]>;
+  infer: (input: string) => Promise<string>;
 }
