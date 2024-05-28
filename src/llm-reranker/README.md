@@ -19,22 +19,20 @@ new-provider-new-model.txt
 We can write the prompt in the file in plain text with format that is similar to template literals in JavaScript. For example:
 
 ```text
-Based on the context below:
-${context}
+Search query: ${query}
 
-Please select the best sentence from the following candidates:
-${candidates}
+Rank the following sentences in order of relevance to the search query:
+${passages}
 ```
 
-When using the prompt template as an input in the LLM, we need to replace `${context}` with the context and `${candidates}` with the candidates like the following:
+The prompt file can contain placeholders that will be replaced by the actual values when the prompt is used. The placeholders should be wrapped in `${}`. The available placeholders are:
 
-```text
-Based on the context below:
-This is a context.
+- `${query}`: The search query.
+- `${length}`: The number of candidate sentences.
+- `${passages}`: The list of candidate sentences. Format:
 
-Please select the best sentence from the following candidates:
-1. Candidate 1
-2. Candidate 2
-```
-
-To do this, we must use the `PromptTemplate` class with `eval()` function. The eval function will evaluate the template string and replace the `${context}` and `${candidates}` with the actual context and candidates.
+  ```txt
+  [1] Sentence 1
+  [2] Sentence 2
+  [3] Sentence 3
+  ```

@@ -4,7 +4,7 @@ import { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions"
 
 export class ProviderGroq implements ModelProvider {
   model: string;
-  apiKey: string | undefined;
+  apiKey?: string;
 
   name = "groq";
 

@@ -4,6 +4,11 @@ import { PromptTemplate } from "./prompts";
 
 export * from "./providers";
 
+interface RankerParams {
+  windowSize: number;
+  step: number;
+}
+
 /**
  * LLMReranker is a class that provides a reranking functionality using
  * a language model from various LLM providers like Groq.
@@ -16,10 +21,12 @@ export * from "./providers";
  * ```
  *
  * @param provider The provider of the language model.
+ * @param params Optional parameters for the reranker sliding window algorithm.
  */
 export class LLMReranker {
-  constructor(public provider: ModelProvider) {
+  constructor(public provider: ModelProvider, public params?: RankerParams) {
     this.provider = provider;
+    this.params = params;
     this.validateProviderModel();
   }
 
@@ -39,25 +46,43 @@ export class LLMReranker {
     contentKey: keyof IndexedType,
     query: string
   ): Promise<string[]> {
-    const length = list.length;
-
-    let passages = "";
+    let passages: string[] = [];
     list.forEach((item, index) => {
-      passages += `[${index + 1}] ${item[contentKey]}\n`;
+      passages.push(`[${index + 1}] ${item[contentKey]}`);
     });
 
-    let provider = this.provider.name;
-    let modelName = this.provider.model;
+    const windowSize = this.params?.windowSize || 10;
+    const step = this.params?.step || 5;
 
-    let prompt = new PromptTemplate(`${provider}-${modelName}`).prompt;
-    let input = eval("`" + prompt + "`");
+    const length = list.length;
+    let start = length - windowSize > 0 ? length - windowSize : 0;
 
-    const completion = await this.provider.infer(input);
-    const ranks = this.parseResult(completion);
+    while (start >= 0) {
+      const batch = passages.slice(start, start + windowSize);
+      const rank = await this.rankBatch(query, batch);
 
-    const result: Array<string> = [];
-    ranks.forEach((index) => {
-      result.push(list[index - 1][idKey]);
+      // Restructure passages based on the ranking.
+      for (let i = 0; i < rank.length; i++) {
+        const index = start + i;
+        passages[index] = rank[i];
+      }
+
+      // If the start is 0, the entire list has been processed and we can break.
+      if (start === 0) {
+        break;
+      }
+
+      // Move the window to the left but not beyond the start point.
+      start = start - step > 0 ? start - step : 0;
+    }
+
+    let result: string[] = [];
+    passages.forEach((item) => {
+      const match = item.match(/\[(\d+)\]/g);
+      if (match) {
+        const index = parseInt(match[0].replace(/\[|\]/g, ""));
+        result.push(list[index - 1][idKey]);
+      }
     });
 
     return result;
@@ -84,30 +109,28 @@ export class LLMReranker {
     }
   }
 
-  /**
-   * Parses the completion result to extract the ranking.
-   *
-   * The result should be in the following format:
-   *
-   * ```txt
-   * [1] > [2] > [3] > [4] > [5]
-   * ```
-   *
-   * @param result Completion result from the language model.
-   * @returns A list of indices in the order of relevance.
-   */
-  private parseResult(result: string): Array<number> {
-    const lines = result.split(">");
-    const ranking: Array<number> = [];
+  private async rankBatch(query: string, batch: string[]): Promise<string[]> {
+    let provider = this.provider.name;
+    let modelName = this.provider.model;
 
-    lines.forEach((line) => {
-      const match = line.match(/\[(\d+)\]/g);
-      if (match) {
-        const index = parseInt(match[0].replace(/\[|\]/g, ""));
-        ranking.push(index);
+    // Params required for the prompt. Don't change the name or remove them.
+    let passages = batch.join("\n");
+    let length = batch.length;
+
+    let prompt = new PromptTemplate(`${provider}-${modelName}`).prompt;
+    let input = eval("`" + prompt + "`");
+
+    const completion = await this.provider.infer(input);
+    const ranks = completion.split(">").map((item) => item.trim());
+
+    let result: Array<string> = [];
+    ranks.forEach((rank) => {
+      let match = batch.filter((item) => item.startsWith(rank));
+      if (match.length > 0) {
+        result.push(match[0]);
       }
     });
 
-    return ranking;
+    return result;
   }
 }
