@@ -1,7 +1,6 @@
-import { IndexedType } from "../../types";
-
 // Export providers.
 export { ProviderGroq } from "./groq";
+export { ProviderOpenAI } from "./openai";
 
 export interface ModelProvider {
   name: string;

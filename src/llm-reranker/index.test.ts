@@ -1,20 +1,32 @@
-import { LLMReranker, ProviderGroq } from ".";
+import { LLMReranker, ModelProvider, ProviderGroq, ProviderOpenAI } from ".";
 
 // Substitute with your own API key.
-const API_KEY = "xxx";
+const GROQ_API_KEY = "xxx";
+const OPENAI_API_KEY = "xxx";
+
+// Mock data for testing.
+const QUERY = "I love apples";
+const LIST = [
+  { id: "a", value: "My name is Edwin" },
+  { id: "b", value: "My favorite food is cheeseburgers" },
+  { id: "c", value: "I love apple" },
+  { id: "d", value: "There is a frog in the well" },
+];
+
+async function testRerank(provider: ModelProvider): Promise<string[]> {
+  const reranker = new LLMReranker(provider, { windowSize: 2, step: 1 });
+  const result = await reranker.rerank(LIST, "id", "value", QUERY);
+  expect(result.length).toBe(LIST.length);
+  expect(result[0]).toBe("c");
+  return result;
+}
 
 test("test groq ranker", async () => {
-  const provider = new ProviderGroq("llama3-8b-8192", API_KEY);
-  const reranker = new LLMReranker(provider, { windowSize: 2, step: 1 });
+  const provider = new ProviderGroq("llama3-8b-8192", GROQ_API_KEY);
+  await testRerank(provider);
+});
 
-  const rankedList = [
-    { id: "a", value: "My name is Edwin" },
-    { id: "b", value: "My favorite food is cheeseburgers" },
-    { id: "c", value: "I love apple" },
-    { id: "d", value: "There is a frog in the well" },
-  ];
-
-  const query = "I love apples";
-  const result = await reranker.rerank(rankedList, "id", "value", query);
-  expect(result[0]).toBe("a");
+test("test openai ranker", async () => {
+  const provider = new ProviderOpenAI("gpt-4", OPENAI_API_KEY);
+  await testRerank(provider);
 });

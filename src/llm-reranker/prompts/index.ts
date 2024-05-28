@@ -24,7 +24,6 @@ export class PromptTemplate {
     let file = `src/llm-reranker/prompts/${name}.txt`;
 
     if (!fs.existsSync(file)) {
-      console.error(`Prompt file "${file}" not found. Using default prompt.`);
       file = "src/llm-reranker/prompts/default.txt";
     }
 

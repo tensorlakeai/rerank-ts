@@ -8,7 +8,12 @@
 
 - [Permutation Generation with sliding windows](https://arxiv.org/pdf/2304.09542)
 
-Example Usage:
+**Available Providers:**
+
+- `ProviderGroq`
+- `ProviderOpenAI`
+
+**Example Usage:**
 
 ```typescript
 import { LLMReranker, ProviderGroq } from "rerank";
