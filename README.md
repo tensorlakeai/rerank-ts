@@ -2,6 +2,14 @@
 
 `reranker-ts` is a lightweight TypeScript library for re-ranking search results from retreival systems.
 
+## Installation
+
+Install `rerank` using npm:
+
+```bash
+npm install rerank
+```
+
 ## Algorithms
 
 #### LLM Re-Rankers
@@ -36,15 +44,7 @@ const result = await reranker.rerank(list, "key", "value", query);
 Combine multiple rank lists by assigning scores based on reciprocal ranks, effectively prioritizing higher-ranked items across all lists.
 [Paper](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf)
 
-## Installation
-
-Install `rerank` using npm:
-
-```bash
-npm install rerank
-```
-
-## Example Usage
+**Example Usage:**
 
 ```typescript
 import { reciprocalRankFusion } from "rerank";
