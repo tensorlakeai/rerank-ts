@@ -1,8 +1,13 @@
 import { LLMReranker, ModelProvider, ProviderGroq, ProviderOpenAI } from ".";
+import "dotenv/config";
 
-// Substitute with your own API key.
-const GROQ_API_KEY = "xxx";
-const OPENAI_API_KEY = "xxx";
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+// Conditional check for required environment variables.
+if (GROQ_API_KEY === undefined || OPENAI_API_KEY === undefined) {
+  throw new Error("Required environment variables are not set!");
+}
 
 // Mock data for testing.
 const QUERY = "I love apples";
