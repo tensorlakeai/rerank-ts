@@ -47,9 +47,9 @@ export class LLMReranker {
     query: string
   ): Promise<string[]> {
     let passages: string[] = [];
-    list.forEach((item, index) => {
-      passages.push(`[${index + 1}] ${item[contentKey]}`);
-    });
+    for (let index = 0; index < list.length; index++) {
+      passages.push(`[${index + 1}] ${list[index][contentKey]}`);
+    }
 
     const windowSize = this.params?.windowSize || 10;
     const step = this.params?.step || 5;
@@ -77,13 +77,17 @@ export class LLMReranker {
     }
 
     let result: string[] = [];
-    passages.forEach((item) => {
-      const match = item.match(/\[(\d+)\]/g);
+    for (let i = 0; i < passages.length; i++) {
+      const match = passages[i].match(/\[(\d+)\]/g);
       if (match) {
-        const index = parseInt(match[0].replace(/\[|\]/g, ""));
-        result.push(list[index - 1][idKey]);
+        const index = parseInt(match[0].replace(/\[|\]/g, ""), 10);
+        if (index > 0 && index <= list.length) {
+          // Check to ensure index is within bounds to prevent index -1/out of bounds error.
+          result.push(list[index - 1][idKey]);
+        }
       }
-    });
+    }
+
 
     return result;
   }
@@ -124,12 +128,17 @@ export class LLMReranker {
     const ranks = completion.split(">").map((item) => item.trim());
 
     let result: Array<string> = [];
-    ranks.forEach((rank) => {
-      let match = batch.filter((item) => item.startsWith(rank));
-      if (match.length > 0) {
-        result.push(match[0]);
+    for (let i = 0; i < ranks.length; i++) {
+      const rank = ranks[i];
+      let matchFound = false;
+      for (let j = 0; j < batch.length; j++) {
+        if (batch[j].startsWith(rank)) {
+          result.push(batch[j]);
+          matchFound = true;
+          break;
+        }
       }
-    });
+    }
 
     return result;
   }
