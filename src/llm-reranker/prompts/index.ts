@@ -1,6 +1,3 @@
-import fs from "fs";
-import * as path from "path";
-
 /**
  * Class to load and store prompt templates.
  *
@@ -14,6 +11,9 @@ import * as path from "path";
  *
  * @param name Name of the prompt file.
  */
+
+import defaultPrompt from "./default";
+import groqllama38b8192 from "./groq-llama3-8b-8192";
 export class PromptTemplate {
   public prompt: string;
 
@@ -22,12 +22,10 @@ export class PromptTemplate {
   }
 
   private getPrompt(name: string) {
-    let file = path.join(__dirname, `${name}.txt`);
-
-    if (!fs.existsSync(file)) {
-      file = path.join(__dirname, "default.txt");
-    }
-
-    return fs.readFileSync(file, "utf-8");
+    const prompts: Record<string, string> = {
+      default: defaultPrompt,
+      "groq-llama3-8b-8192": groqllama38b8192,
+    };
+    return prompts[name] || prompts["default"];
   }
 }
