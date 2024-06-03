@@ -1,4 +1,5 @@
 import fs from "fs";
+import * as path from "path";
 
 /**
  * Class to load and store prompt templates.
@@ -21,10 +22,10 @@ export class PromptTemplate {
   }
 
   private getPrompt(name: string) {
-    let file = `src/llm-reranker/prompts/${name}.txt`;
+    let file = path.join(__dirname, `${name}.txt`);
 
     if (!fs.existsSync(file)) {
-      file = "src/llm-reranker/prompts/default.txt";
+      file = path.join(__dirname, "default.txt");
     }
 
     return fs.readFileSync(file, "utf-8");
