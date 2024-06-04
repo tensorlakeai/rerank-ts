@@ -1,4 +1,5 @@
 // Export providers.
+import { ProviderAnthropic } from './anthropic';
 export { ProviderGroq } from "./groq";
 export { ProviderOpenAI } from "./openai";
 

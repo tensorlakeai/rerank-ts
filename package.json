@@ -28,6 +28,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.22.0",
     "groq-sdk": "^0.4.0",
     "openai": "^4.47.2"
   }
