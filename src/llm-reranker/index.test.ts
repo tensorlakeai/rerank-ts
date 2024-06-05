@@ -20,7 +20,8 @@ const LIST = [
 
 async function testRerank(provider: ModelProvider): Promise<string[]> {
   const reranker = new LLMReranker(provider, { windowSize: 2, step: 1 });
-  const result = await reranker.rerank(LIST, "id", "value", QUERY);
+  const { result, usage } = await reranker.rerank(LIST, "id", "value", QUERY);
+  console.log(usage);
   expect(result.length).toBe(LIST.length);
   expect(result[0]).toBe("c");
   return result;

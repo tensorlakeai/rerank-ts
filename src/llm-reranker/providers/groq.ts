@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-import { ModelProvider } from ".";
+import { ModelProvider, ModelUsage } from ".";
 import { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions";
 
 export class ProviderGroq implements ModelProvider {
@@ -27,7 +27,9 @@ export class ProviderGroq implements ModelProvider {
    * @param input Prompt to infer the completion.
    * @returns Text completion from the language model.
    */
-  public async infer(input: string): Promise<string> {
+  public async infer(
+    input: string
+  ): Promise<{ output: string; usage: ModelUsage }> {
     const groq = new Groq({
       apiKey: this.apiKey,
     });
@@ -41,6 +43,13 @@ export class ProviderGroq implements ModelProvider {
       model: this.model,
     });
 
-    return completion.choices[0]?.message?.content || "";
+    return {
+      output: completion.choices[0]?.message?.content || "",
+      usage: {
+        completionTime: completion.usage?.total_time,
+        promptTokens: completion.usage?.prompt_tokens,
+        completionTokens: completion.usage?.completion_tokens,
+      },
+    };
   }
 }

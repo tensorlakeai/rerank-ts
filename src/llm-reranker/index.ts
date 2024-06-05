@@ -1,5 +1,5 @@
 import { IndexedType } from "../types";
-import { ModelProvider } from "./providers";
+import { ModelProvider, ModelUsage } from "./providers";
 import { PromptTemplate } from "./prompts";
 
 export * from "./providers";
@@ -45,8 +45,10 @@ export class LLMReranker {
     idKey: keyof IndexedType,
     contentKey: keyof IndexedType,
     query: string
-  ): Promise<string[]> {
+  ): Promise<{ result: string[]; usage: ModelUsage[] }> {
     let passages: string[] = [];
+    const usageResult: ModelUsage[] = [];
+
     for (let index = 0; index < list.length; index++) {
       passages.push(`[${index + 1}] ${list[index][contentKey]}`);
     }
@@ -56,11 +58,10 @@ export class LLMReranker {
 
     const length = list.length;
     let start = length - windowSize > 0 ? length - windowSize : 0;
-
     while (start >= 0) {
       const batch = passages.slice(start, start + windowSize);
-      const rank = await this.rankBatch(query, batch);
-
+      const { result: rank, usage } = await this.rankBatch(query, batch);
+      usageResult.push(usage);
       // Restructure passages based on the ranking.
       for (let i = 0; i < rank.length; i++) {
         const index = start + i;
@@ -88,8 +89,7 @@ export class LLMReranker {
       }
     }
 
-
-    return result;
+    return { result, usage: usageResult };
   }
 
   /**
@@ -113,7 +113,10 @@ export class LLMReranker {
     }
   }
 
-  private async rankBatch(query: string, batch: string[]): Promise<string[]> {
+  private async rankBatch(
+    query: string,
+    batch: string[]
+  ): Promise<{ result: string[]; usage: ModelUsage }> {
     let provider = this.provider.name;
     let modelName = this.provider.model;
 
@@ -124,7 +127,7 @@ export class LLMReranker {
     let prompt = new PromptTemplate(`${provider}-${modelName}`).prompt;
     let input = eval("`" + prompt + "`");
 
-    const completion = await this.provider.infer(input);
+    const { output: completion, usage } = await this.provider.infer(input);
     const ranks = completion.split(">").map((item) => item.trim());
 
     let result: Array<string> = [];
@@ -140,6 +143,6 @@ export class LLMReranker {
       }
     }
 
-    return result;
+    return { result, usage };
   }
 }

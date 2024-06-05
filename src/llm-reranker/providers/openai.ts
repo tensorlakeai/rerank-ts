@@ -1,5 +1,6 @@
 import OpenAI from "openai";
-import { ModelProvider } from ".";
+import { ModelProvider, ModelUsage } from ".";
+import { performance } from "perf_hooks";
 
 export class ProviderOpenAI implements ModelProvider {
   model: string;
@@ -18,14 +19,25 @@ export class ProviderOpenAI implements ModelProvider {
    * @param input Prompt to infer the completion.
    * @returns Text completion from the language model.
    */
-  public async infer(input: string): Promise<string> {
+  public async infer(
+    input: string
+  ): Promise<{ output: string; usage: ModelUsage }> {
     const openai = new OpenAI({ apiKey: this.apiKey });
 
+    const startTime = performance.now();
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: input }],
       model: this.model,
     });
+    const completionTime = performance.now() - startTime;
 
-    return completion.choices[0]?.message?.content || "";
+    return {
+      output: completion.choices[0]?.message?.content || "",
+      usage: {
+        completionTokens: completion.usage?.completion_tokens,
+        promptTokens: completion.usage?.prompt_tokens,
+        completionTime,
+      },
+    };
   }
 }
