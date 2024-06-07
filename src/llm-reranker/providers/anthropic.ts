@@ -52,6 +52,7 @@ export class ProviderAnthropic implements ModelProvider {
 
     const completion = await anthropic.messages.create(params);
 
+    // TODO: Handle multiple completions
     return ''
   }
 }
