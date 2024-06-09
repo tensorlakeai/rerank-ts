@@ -1,6 +1,8 @@
 # reranker-ts
 
-`reranker-ts` is a lightweight TypeScript library for re-ranking search results from retreival systems.
+`reranker-ts` is a lightweight TypeScript library for re-ranking search results from retreival systems. 
+
+Adding Re-Ranking almost always improves accuracy of retrieval pipelines. If you are building a RAG application, and using semantic search or full-text search using this library to re-rank the results will improve accuracy of the application in most cases. However, re-ranking usually adds some amount of latency. We have added knobs in the LLM ReRanker to control latency. 
 
 ## Installation
 
@@ -11,6 +13,8 @@ npm install rerank
 ```
 
 ## Algorithms
+- LLM Re-Rankers
+- Reciprocal Rank Fusion
 
 ### LLM Re-Rankers
 
@@ -18,8 +22,10 @@ npm install rerank
 
 **Available Providers:**
 
-- `ProviderGroq`
-- `ProviderOpenAI`
+- **Groq**: `ProviderGroq`
+- **OpenAI**: `ProviderOpenAI`
+
+> Model Providers are implemented with a clean interface, we welcome contributions to add support for other model providers from the community! 
 
 **Example Usage:**
 
