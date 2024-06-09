@@ -1,4 +1,4 @@
-# reranker-ts
+# rerank-ts
 
 `rerank-ts` is a lightweight TypeScript library for re-ranking search results from retreival systems. 
 
