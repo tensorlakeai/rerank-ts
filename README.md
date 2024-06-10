@@ -55,32 +55,32 @@ Combine multiple rank lists by assigning scores based on reciprocal ranks, effec
 ```typescript
 import { reciprocalRankFusion } from "rerank";
 
-interface ImageSearchResult {
+// Example structure of a search result
+interface SearchResult {
   url: string;
-  width: string;
-  height: string;
-  score: number;
+  name: string
 }
 
-// assume you are searching 3 different queries
-const rankedLists: ImageSearchResult[][] = await Promise.all([
-  searchIndex("imageEmbeddingIndex", "person riding skateboard"),
-  searchIndex("imageEmbeddingIndex", "person skating on the sidewalk"),
-  searchIndex("imageIndex", "skateboard trick"),
+// Assume you are searching with 3 different queries and fetching results
+const rankedLists: SearchResult[][] = await Promise.all([
+  searchIndex("exampleIndex1", "person riding skateboard"),
+  searchIndex("exampleIndex2", "person skating on the sidewalk"),
+  searchIndex("exampleIndex3", "skateboard trick"),
 ]);
 
-// perform reciprocal rank fusion on all of the results and specify key id, in this case "url"
-// this will return a map of all urls now ranked with rrf score
+// Perform Reciprocal Rank Fusion (RRF) on all of the results
+// The RRF function takes the ranked lists and a key identifier, in this case "url"
+// It returns a map of all URLs now ranked with an RRF score
 const rankedURLs = reciprocalRankFusion(rankedLists, "url");
 
-// build map of results keyed by url
-const resultsMap = new Map<string, ImageSearchResult>();
+// Build a map of results keyed by URL for easy access
+const resultsMap = new Map<string, SearchResult>();
 rankedLists.flat().forEach((result) => {
   resultsMap.set(result.url, result);
 });
 
-// get single sorted results list from rrf
-const sortedResults = Array.from(rankedUrls.keys()).map((url) => {
+// Get a single sorted list of results based on the RRF ranking
+const sortedResults = Array.from(rankedURLs.keys()).map((url) => {
   return resultsMap.get(url);
 });
 ```
