@@ -55,13 +55,14 @@ Combine multiple rank lists by assigning scores based on reciprocal ranks, effec
 ```typescript
 import { reciprocalRankFusion } from "rerank";
 
-// Example structure of a search result
+// Example structure of a search result for this usage example
 interface SearchResult {
-  url: string;
-  name: string
+  url: string; // we will use this as our key identifier
+  name: string;
 }
 
 // Assume you are searching with 3 different queries and fetching results
+// searchIndex is just for demonstration purposes and should be replaced with your actual search implementation
 const rankedLists: SearchResult[][] = await Promise.all([
   searchIndex("exampleIndex1", "person riding skateboard"),
   searchIndex("exampleIndex2", "person skating on the sidewalk"),
