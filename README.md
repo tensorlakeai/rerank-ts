@@ -45,7 +45,7 @@ const result = await reranker.rerank(list, "key", "value", query);
 // ["236386f2", "bc8fe338"]
 ```
 
-### Reciprocal RankFusion
+### Reciprocal Rank Fusion
 
 Combine multiple rank lists by assigning scores based on reciprocal ranks, effectively prioritizing higher-ranked items across all lists.
 [Paper](https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf)
