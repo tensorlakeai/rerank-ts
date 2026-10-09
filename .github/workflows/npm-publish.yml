@@ -13,43 +13,41 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.28.5
+          run_install: false
       - uses: actions/setup-node@v3
         with:
-          cache: npm
-          node-version: 20
+          cache: pnpm
+          node-version: '24'
 
-      - uses: actions/cache@v3
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
-      - run: npm ci
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --ignore-scripts
 
+        name: Install guarded dependencies
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set up pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.28.5
+          run_install: false
       - uses: actions/setup-node@v3
         with:
-          cache: npm
-          node-version: 20
+          cache: pnpm
+          node-version: '24'
           registry-url: https://registry.npmjs.org/
 
-      - name: Cache NPM Dependencies
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install guarded dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Check Cache & Install Dependencies
-        if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-        run: npm ci
-
-      - run: npm publish
+      - run: "pnpm run build\nnpm publish --ignore-scripts"
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

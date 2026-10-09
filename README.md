@@ -88,3 +88,11 @@ const sortedResults = Array.from(rankedURLs.keys()).map((url) => {
   return resultsMap.get(url);
 });
 ```
+
+## Dependency installation
+
+Use Node.js 22+ and pnpm 11.28.5. Run `pnpm install --frozen-lockfile` before the
+project build/test commands. The committed policy requires registry releases
+to be at least 24 hours old, rejects missing publish dates, rechecks frozen
+locks, and disables install lifecycle scripts. Run reviewed build steps
+explicitly; do not bypass the delay for a newly published dependency.
